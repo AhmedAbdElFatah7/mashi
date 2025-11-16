@@ -225,6 +225,6 @@ class AdsController extends Controller
         $pageTitle = 'الإعلانات المميزة';
         $isFeaturedPage = true;
 
-        return view('dashboard.ads.index', compact('ads', 'categories', 'pageTitle', 'isFeaturedPage'));
+        return view('dashboard.Ads.index', compact('ads', 'categories', 'pageTitle', 'isFeaturedPage'));
     }
 }

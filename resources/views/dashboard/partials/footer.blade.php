@@ -9,12 +9,12 @@
                                             <script>
                                                 document.write(new Date().getFullYear())
                                             </script>
-                                            Rizz
+                                            Mashii
                                             <span
                                                 class="text-muted d-none d-sm-inline-block float-end">
                                                 Crafted with
                                                 <i class="iconoir-heart text-danger"></i>
-                                                by Mannatthemes</span>
+                                                by Romoz</span>
                                         </p>
                                     </div>
                                 </div>
