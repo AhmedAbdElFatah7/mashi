@@ -108,4 +108,50 @@ class AdsController extends Controller
 
 		return response()->json($ads);
 	}
+
+	public function featured(Request $request)
+	{
+		$ads = Ad::where('is_featured', true)
+			->inRandomOrder()
+			->limit(12)
+			->get()
+			->map(function ($ad) {
+				$images = $ad->images ?? [];
+				if (is_string($images)) {
+					$decoded = json_decode($images, true);
+					if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+						$images = $decoded;
+					} else {
+						$images = [$images];
+					}
+				} elseif (! is_array($images)) {
+					$images = [$images];
+				}
+
+				$images = array_map(function ($image) {
+					if (! $image) {
+						return $image;
+					}
+
+					$path = $image;
+
+					if (Str::startsWith($path, 'public/')) {
+						$path = substr($path, strlen('public/'));
+					}
+
+					if (! Str::startsWith($path, 'storage/')) {
+						$path = 'storage/'.ltrim($path, '/');
+					}
+
+					return asset($path);
+				}, $images);
+
+				$ad->images = $images;
+				return $ad;
+			});
+
+		return response()->json([
+			'ads' => $ads,
+		]);
+	}
 }
