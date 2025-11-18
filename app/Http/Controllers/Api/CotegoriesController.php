@@ -10,11 +10,12 @@ class CotegoriesController extends Controller
 {
     public function index(Request $request)
     {
-        $categories = Category::select('name', 'description', 'logo')
+        $categories = Category::select('id', 'name', 'description', 'logo')
             ->orderBy('name')
             ->get()
             ->map(function ($category) {
                 return [
+                    'id' => $category->id,
                     'name' => $category->name,
                     'description' => $category->description,
                     'image' => $category->logo ? asset('storage/' . $category->logo) : null,
