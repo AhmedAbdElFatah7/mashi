@@ -13,6 +13,7 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::get('/ads/category', [AdsController::class, 'byCategory']);
 Route::get('/ads/featured', [AdsController::class, 'featured']);
+Route::get('/ads/show', [AdsController::class, 'show']);
 Route::middleware('auth:sanctum')->group(function () {
 	Route::post('/logout', [AuthController::class, 'logout']);
 	Route::get('/me', [AuthController::class, 'me']);
