@@ -227,4 +227,24 @@ class AdsController extends Controller
 
         return view('dashboard.Ads.index', compact('ads', 'categories', 'pageTitle', 'isFeaturedPage'));
     }
+
+    public function extent()
+    {
+        $categories = Category::all();
+
+        return view('dashboard.Ads.extent', compact('categories'));
+    }
+
+    public function importFromUrl(Request $request)
+    {
+        $request->validate([
+            'url' => 'required|url',
+            'category_id' => 'required|exists:categories,id',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم سحب الإعلان بنجاح من الرابط المحدد.',
+        ]);
+    }
 }

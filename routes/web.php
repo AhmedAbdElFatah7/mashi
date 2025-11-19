@@ -19,11 +19,15 @@ Route::prefix('admin')
 
         Route::get('/dashboard', [DashboardController::class, 'index'])
             ->name('dashboard');
-        Route::resource('ads', AdsController::class);
-        Route::delete('/ads/{ad}/image', [AdsController::class, 'deleteImage'])
+            Route::get('/ads/extent', [AdsController::class, 'extent'])
+            ->name('ads.extent');
+            Route::post('/ads/import-from-url', [AdsController::class, 'importFromUrl'])
+            ->name('ads.import-from-url');
+            Route::delete('/ads/{ad}/image', [AdsController::class, 'deleteImage'])
             ->name('ads.delete-image');
-        Route::get('/featured-ads', [AdsController::class, 'featured'])
+            Route::get('/featured-ads', [AdsController::class, 'featured'])
             ->name('ads.featured');
+            Route::resource('ads', AdsController::class);
             
         Route::resource('users', UsersController::class)->only(['index', 'show', 'create', 'store', 'destroy']);
         Route::patch('/users/{user}/password', [UsersController::class, 'updatePassword'])

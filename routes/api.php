@@ -15,6 +15,7 @@ Route::get('/ads/category', [AdsController::class, 'byCategory']);
 Route::get('/ads/featured', [AdsController::class, 'featured']);
 Route::middleware('auth:sanctum')->group(function () {
 	Route::post('/logout', [AuthController::class, 'logout']);
+	Route::get('/me', [AuthController::class, 'me']);
 	Route::post('/ads', [AdsController::class, 'store']);
 	Route::get('/favorites', [AdsController::class, 'favorites']);
 	Route::post('/favorites', [AdsController::class, 'addToFavorites']);

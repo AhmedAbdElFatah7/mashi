@@ -81,6 +81,13 @@
                             <span class="menu-title">الإعلانات المميزة</span>
                         </a>
                     </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('ads.extent') ? 'active' : '' }}" href="{{ route('ads.extent') }}">
+                            <i class="iconoir-medal me-2"></i>
+                            <span class="menu-title"> سحب الاعلانات </span>
+                        </a>
+                    </li>
                     <!-- عنوان قسم التصنيفات -->
                     <li class="menu-label mt-3">
                         <small class="label-border">
