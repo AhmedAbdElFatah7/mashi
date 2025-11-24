@@ -109,6 +109,7 @@ class AdsController extends Controller
 			], 422);
 		}
 		$ads = Ad::where('category_id', $request->category_id)
+			->with('user')
 			->latest()
 			->get()
 			->map(function ($ad) {

@@ -34,14 +34,12 @@ class ProfileController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'phone' => ['nullable', 'string', 'max:20'],
-            'city' => ['nullable', 'string', 'max:100'],
         ]);
 
         $user->update([
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
-            'city' => $request->city,
         ]);
 
         return response()->json([
@@ -95,6 +93,29 @@ class ProfileController extends Controller
             'data' => [
                 'image_url' => asset('storage/' . $imagePath),
             ],
+        ]);
+    }
+
+    public function updateLocation(Request $request)
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'city' => ['nullable', 'string', 'max:255'],
+            'area' => ['nullable', 'string', 'max:255'],
+            'location' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $user->update([
+            'city' => $request->city,
+            'area' => $request->area,
+            'location' => $request->location,
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'تم تحديث الموقع بنجاح',
+            'data' => $user,
         ]);
     }
 }
