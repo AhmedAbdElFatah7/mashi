@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('role')->default('user');
             $table->boolean('status')->default(true);
             $table->string('image')->nullable();
+            $table->string('cover')->nullable();
             $table->string('city')->nullable();
             $table->string('area')->nullable();
             $table->string('location')->nullable();

@@ -35,6 +35,7 @@ class AdsController extends Controller
 			'allow_whatsapp_messages' => ['boolean'],
 			'fee_agree' => ['boolean'],
 			'is_featured' => ['boolean'],
+			'isNegotiable' => ['boolean'],
 		]);
 
 		if ($validator->fails()) {
@@ -85,7 +86,7 @@ class AdsController extends Controller
 			}
 
 			if (! Str::startsWith($path, 'storage/')) {
-				$path = 'storage/'.ltrim($path, '/');
+				$path = 'storage/' . ltrim($path, '/');
 			}
 
 			return asset($path);
@@ -141,7 +142,7 @@ class AdsController extends Controller
 
 					// If already starts with "storage/", use as is, otherwise prefix it
 					if (! Str::startsWith($path, 'storage/')) {
-						$path = 'storage/'.ltrim($path, '/');
+						$path = 'storage/' . ltrim($path, '/');
 					}
 
 					return asset($path);
@@ -185,7 +186,7 @@ class AdsController extends Controller
 					}
 
 					if (! Str::startsWith($path, 'storage/')) {
-						$path = 'storage/'.ltrim($path, '/');
+						$path = 'storage/' . ltrim($path, '/');
 					}
 
 					return asset($path);
@@ -293,7 +294,7 @@ class AdsController extends Controller
 					}
 
 					if (! Str::startsWith($path, 'storage/')) {
-						$path = 'storage/'.ltrim($path, '/');
+						$path = 'storage/' . ltrim($path, '/');
 					}
 
 					return asset($path);
@@ -305,6 +306,150 @@ class AdsController extends Controller
 
 		return response()->json([
 			'ads' => $ads,
+		]);
+	}
+
+	public function addComment(Request $request)
+	{
+		$user = $request->user();
+		if (!$user) {
+			return response()->json([
+				'status' => false,
+				'message' => 'Unauthenticated.',
+			], 401);
+		}
+
+		$validator = Validator::make($request->all(), [
+			'ad_id' => ['required', 'exists:ads,id'],
+			'comment' => ['required', 'string', 'max:1000'],
+		]);
+
+		if ($validator->fails()) {
+			return response()->json([
+				'status' => false,
+				'message' => 'Validation error',
+				'errors' => $validator->errors(),
+			], 422);
+		}
+
+		$comment = \App\Models\Comment::create([
+			'user_id' => $user->id,
+			'ad_id' => $request->ad_id,
+			'comment' => $request->comment,
+		]);
+
+		$comment->load('user');
+
+		return response()->json([
+			'status' => true,
+			'message' => 'تم إضافة التعليق بنجاح',
+			'data' => $comment,
+		], 201);
+	}
+
+	public function getComments(Request $request)
+	{
+		$validator = Validator::make($request->all(), [
+			'ad_id' => ['required', 'exists:ads,id'],
+		]);
+
+		if ($validator->fails()) {
+			return response()->json([
+				'status' => false,
+				'message' => 'Validation error',
+				'errors' => $validator->errors(),
+			], 422);
+		}
+
+		$user = $request->user();
+		$comments = \App\Models\Comment::where('ad_id', $request->ad_id)
+			->with('user')
+			->withCount('likes')
+			->latest()
+			->get()
+			->map(function ($comment) use ($user) {
+				$comment->is_liked = $user ? $comment->isLikedBy($user->id) : false;
+				return $comment;
+			});
+
+		return response()->json([
+			'status' => true,
+			'message' => 'Comments retrieved successfully',
+			'data' => $comments,
+		]);
+	}
+
+	public function likeComment(Request $request)
+	{
+		$user = $request->user();
+		if (!$user) {
+			return response()->json([
+				'status' => false,
+				'message' => 'Unauthenticated.',
+			], 401);
+		}
+
+		$validator = Validator::make($request->all(), [
+			'comment_id' => ['required', 'exists:comments,id'],
+		]);
+
+		if ($validator->fails()) {
+			return response()->json([
+				'status' => false,
+				'message' => 'Validation error',
+				'errors' => $validator->errors(),
+			], 422);
+		}
+
+		$comment = \App\Models\Comment::find($request->comment_id);
+
+		// Add like (syncWithoutDetaching prevents duplicates)
+		$comment->likes()->syncWithoutDetaching([$user->id]);
+
+		return response()->json([
+			'status' => true,
+			'message' => 'تم الإعجاب بالتعليق بنجاح',
+			'data' => [
+				'likes_count' => $comment->likes()->count(),
+				'is_liked' => true,
+			],
+		]);
+	}
+
+	public function unlikeComment(Request $request)
+	{
+		$user = $request->user();
+		if (!$user) {
+			return response()->json([
+				'status' => false,
+				'message' => 'Unauthenticated.',
+			], 401);
+		}
+
+		$validator = Validator::make($request->all(), [
+			'comment_id' => ['required', 'exists:comments,id'],
+		]);
+
+		if ($validator->fails()) {
+			return response()->json([
+				'status' => false,
+				'message' => 'Validation error',
+				'errors' => $validator->errors(),
+			], 422);
+		}
+
+		$comment = \App\Models\Comment::find($request->comment_id);
+
+		// Remove like
+		$comment->likes()->detach($user->id);
+
+		return response()->json([
+			'status' => true,
+			'message' => 'تم إلغاء الإعجاب بالتعليق',
+			'data' => [
+				'likes_count' => $comment->likes()->count(),
+				'is_liked' => false,
+			],
 		]);
 	}
 }

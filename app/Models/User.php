@@ -26,6 +26,7 @@ class User extends Authenticatable
         'role',
         'status',
         'image',
+        'cover',
         'city',
         'area',
         'location',
@@ -55,6 +56,29 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = ['image_profile', 'cover_image'];
+
+    /**
+     * Get the user's profile image URL.
+     */
+    public function getImageProfileAttribute(): ?string
+    {
+        return $this->image ? asset('storage/' . $this->image) : null;
+    }
+
+    /**
+     * Get the user's cover image URL.
+     */
+    public function getCoverImageAttribute(): ?string
+    {
+        return $this->cover ? asset('storage/' . $this->cover) : null;
+    }
+
     public function ads()
     {
         return $this->hasMany(Ad::class);
@@ -63,5 +87,10 @@ class User extends Authenticatable
     public function favoriteAds()
     {
         return $this->belongsToMany(Ad::class, 'favorites')->withTimestamps();
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
     }
 }

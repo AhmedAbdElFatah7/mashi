@@ -14,18 +14,27 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/ads/category', [AdsController::class, 'byCategory']);
 Route::get('/ads/featured', [AdsController::class, 'featured']);
 Route::get('/ads/show', [AdsController::class, 'show']);
+Route::get('/ads/comments', [AdsController::class, 'getComments']);
+Route::get('/user/{id}', [ProfileController::class, 'getUserById']);
+
+
 Route::middleware('auth:sanctum')->group(function () {
 	Route::post('/logout', [AuthController::class, 'logout']);
 	Route::get('/me', [AuthController::class, 'me']);
 	Route::post('/ads', [AdsController::class, 'store']);
+	Route::post('/ads/comment', [AdsController::class, 'addComment']);
+	Route::post('/comments/like', [AdsController::class, 'likeComment']);
+	Route::post('/comments/unlike', [AdsController::class, 'unlikeComment']);
 	Route::get('/favorites', [AdsController::class, 'favorites']);
 	Route::post('/favorites', [AdsController::class, 'addToFavorites']);
 	Route::post('/favorites/delete', [AdsController::class, 'removeFromFavorites']);
+
 
 	// Profile routes
 	Route::get('/profile', [ProfileController::class, 'show']);
 	Route::post('/profile', [ProfileController::class, 'updateProfile']);
 	Route::post('/profile/password', [ProfileController::class, 'updatePassword']);
 	Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar']);
+	Route::post('/profile/cover', [ProfileController::class, 'updateCover']);
 	Route::post('/profile/location', [ProfileController::class, 'updateLocation']);
 });

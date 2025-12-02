@@ -24,6 +24,7 @@ class Ad extends Model
         'allow_whatsapp_messages',
         'fee_agree',
         'is_featured',
+        'isNegotiable',
     ];
 
     protected $casts = [
@@ -32,6 +33,7 @@ class Ad extends Model
         'allow_whatsapp_messages' => 'boolean',
         'fee_agree' => 'boolean',
         'is_featured' => 'boolean',
+        'isNegotiable' => 'boolean',
         'price' => 'decimal:2',
     ];
 
@@ -48,5 +50,10 @@ class Ad extends Model
     public function favoritedBy()
     {
         return $this->belongsToMany(User::class, 'favorites')->withTimestamps();
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
     }
 }

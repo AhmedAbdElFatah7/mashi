@@ -17,11 +17,41 @@ class ProfileController extends Controller
         $user = $request->user();
         $data = $user->toArray();
 
-        $data['image_url'] = $user->image ? asset('storage/' . $user->image) : null;
+        $data['image_profile'] = $user->image ? asset('storage/' . $user->image) : null;
+        $data['cover_image'] = $user->cover ? asset('storage/' . $user->cover) : null;
+
+        // Get user's ads
+        $data['ads'] = $user->ads()->with('category')->latest()->get();
 
         return response()->json([
             'status' => true,
             'message' => 'Profile data',
+            'data' => $data,
+        ]);
+    }
+
+    public function getUserById($id)
+    {
+        $user = \App\Models\User::find($id);
+
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'المستخدم غير موجود',
+            ], 404);
+        }
+
+        $data = $user->toArray();
+
+        $data['image_profile'] = $user->image ? asset('storage/' . $user->image) : null;
+        $data['cover_image'] = $user->cover ? asset('storage/' . $user->cover) : null;
+
+        // Get user's ads
+        $data['ads'] = $user->ads()->with('category')->latest()->get();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'User data',
             'data' => $data,
         ]);
     }
@@ -92,6 +122,33 @@ class ProfileController extends Controller
             'message' => 'تم تحديث الصورة الشخصية بنجاح',
             'data' => [
                 'image_url' => asset('storage/' . $imagePath),
+            ],
+        ]);
+    }
+
+    public function updateCover(Request $request)
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'cover' => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+        ]);
+
+        if ($user->cover && Storage::disk('public')->exists($user->cover)) {
+            Storage::disk('public')->delete($user->cover);
+        }
+
+        $coverPath = $request->file('cover')->store('users/covers', 'public');
+
+        $user->update([
+            'cover' => $coverPath,
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'تم تحديث صورة الغلاف بنجاح',
+            'data' => [
+                'cover_url' => asset('storage/' . $coverPath),
             ],
         ]);
     }
